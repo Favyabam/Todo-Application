@@ -5,16 +5,15 @@ import TodoItems from './TodoItems'
 const Todo = () => {
 
   const [todoList, setTodoList] = useState(localStorage.getItem("todos")? JSON.parse(localStorage.getItem("todos")) : []); 
-
+  const [editingId, setEditingId] = useState(null);
+  const [editingText, setEditingText] = useState("");
   const inputRef = useRef();
 
   const add = ()=>{
     const inputText = inputRef.current.value.trim();
-
     if (inputText === "") {
       return null;
     }
-    
     const newTodo = {
       id: Date.now(),
       text: inputText,
@@ -39,6 +38,26 @@ const Todo = () => {
         return todo;
       })
     })
+  }
+
+  const startEdit = (id, text) => {
+    setEditingId(id);
+    setEditingText(text);
+  }
+
+  const handleEditChange = (e) => {
+    setEditingText(e.target.value);
+  }
+
+  const saveEdit = (id) => {
+    if (editingText.trim() === "") return;
+    setTodoList((prevTodos) =>
+      prevTodos.map((todo) =>
+        todo.id === id ? { ...todo, text: editingText } : todo
+      )
+    );
+    setEditingId(null);
+    setEditingText("");
   }
 
   useEffect(()=>{
@@ -70,10 +89,20 @@ const Todo = () => {
         {/* --- todo list ---- */}
 
         <div>
-          {todoList.map((item, index)=>{
-            return <TodoItems key={index} text={item.text} id={item.id} isComplete={item.isComplete} deleteTodo={deleteTodo} toggle={toggle} />
+          {todoList.map((item)=>{
+            if (editingId === item.id) {
+              return (
+                <div key={item.id} className="flex items-center my-3 gap-6">
+                  <div className="flex flex-1 items-center">
+                    <input type="text" value={editingText} onChange={handleEditChange} className="border bg-gray-400 rounded-full px-7 py-3 w-full" />
+                  </div>
+                  <button onClick={()=>saveEdit(item.id)} className="bg-blue-600 text-white px-4 py-2 rounded-full">Save</button>
+                  <button onClick={()=>{setEditingId(null); setEditingText("");}} className="bg-gray-400 text-white px-4 py-2 rounded-full">Cancel</button>
+                </div>
+              );
+            }
+            return <TodoItems key={item.id} text={item.text} id={item.id} isComplete={item.isComplete} deleteTodo={deleteTodo} toggle={toggle} startEdit={startEdit} />
           })}
-
         </div>
 
     </div>

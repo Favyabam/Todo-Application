@@ -5,8 +5,8 @@ import TodoItems from './TodoItems'
 const Todo = () => {
 
   const [todoList, setTodoList] = useState(localStorage.getItem("todos")? JSON.parse(localStorage.getItem("todos")) : []); 
-  const [editingId, setEditingId] = useState(null);
-  const [editingText, setEditingText] = useState("");
+  const [editId, setEditId] = useState(null);
+  const [editText, setEditText] = useState("");
   const inputRef = useRef();
 
   const add = ()=>{
@@ -41,23 +41,23 @@ const Todo = () => {
   }
 
   const startEdit = (id, text) => {
-    setEditingId(id);
-    setEditingText(text);
+    setEditId(id);
+    setEditText(text);
   }
 
   const handleEditChange = (e) => {
-    setEditingText(e.target.value);
+    setEditText(e.target.value);
   }
 
   const saveEdit = (id) => {
-    if (editingText.trim() === "") return;
+    if (editText.trim() === "") return;
     setTodoList((prevTodos) =>
       prevTodos.map((todo) =>
-        todo.id === id ? { ...todo, text: editingText } : todo
+        todo.id === id ? { ...todo, text: editText } : todo
       )
     );
-    setEditingId(null);
-    setEditingText("");
+    setEditId(null);
+    setEditText("");
   }
 
   useEffect(()=>{
@@ -90,14 +90,14 @@ const Todo = () => {
 
         <div>
           {todoList.map((item)=>{
-            if (editingId === item.id) {
+            if (editId === item.id) {
               return (
                 <div key={item.id} className="flex items-center my-3 gap-6">
                   <div className="flex flex-1 items-center">
-                    <input type="text" value={editingText} onChange={handleEditChange} className="border bg-gray-400 rounded-full px-7 py-3 w-full" />
+                    <input type="text" value={editText} onChange={handleEditChange} className="border bg-gray-400 rounded-full px-7 py-3 w-full" />
                   </div>
                   <button onClick={()=>saveEdit(item.id)} className="bg-blue-600 text-white px-4 py-2 rounded-full">Save</button>
-                  <button onClick={()=>{setEditingId(null); setEditingText("");}} className="bg-gray-400 text-white px-4 py-2 rounded-full">Cancel</button>
+                  <button onClick={()=>{setEditId(null); setEditText("");}} className="bg-gray-400 text-white px-4 py-2 rounded-full">Cancel</button>
                 </div>
               );
             }
